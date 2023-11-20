@@ -52,7 +52,6 @@ class CommunityPostList extends StatelessWidget {
         content: '오늘은 날씨가 좋네요. 같이 산책할 사람 구해요!',
         date: DateTime.now().subtract(const Duration(days: 1)),
       ),
-      // ... 추가적인 게시글 데이터
     ];
 
     return ListView.builder(
@@ -113,18 +112,24 @@ class CommunityPostCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // 첫 번째 버튼(날씨 정보 버튼)을 눌렀을 때의 동작
-                  },
-                  child: const Text('날씨 정보'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextButton(
+                    onPressed: () {
+                      // 첫 번째 버튼(날씨 정보 버튼)을 눌렀을 때의 동작
+                    },
+                    child: const Text('날씨 정보'),
+                  ),
                 ),
                 const SizedBox(width: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // 두 번째 버튼(더 많은 정보 버튼)을 눌렀을 때의 동작
-                  },
-                  child: const Text('더 많은 정보'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextButton(
+                    onPressed: () {
+                      // 두 번째 버튼(더 많은 정보 버튼)을 눌렀을 때의 동작
+                    },
+                    child: const Text('더 많은 정보'),
+                  ),
                 ),
               ],
             ),
