@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final Logger _logger = Logger('_SearchLocationScreenState');
+final prefs = SharedPreferences.getInstance();
 
 class SearchLocationScreen extends StatefulWidget {
   const SearchLocationScreen({Key? key}) : super(key: key);
@@ -43,6 +45,35 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
     }
   }
 
+  Future<List<String>> _loadFromSharedPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const key = 'savedLocation';
+
+      // 저장된 데이터 가져오기
+      List<String> savedLocations = prefs.getStringList(key) ?? [];
+
+      // 가져온 데이터 출력
+      for (String location in savedLocations) {
+        final decodedLocation = jsonDecode(location);
+        print('Saved Location: $decodedLocation');
+      }
+
+      return savedLocations;
+    } catch (e) {
+      _logger.severe('SharedPreferences 로딩 중 오류 발생: $e');
+      return [];
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
   void _performSearch(String query) {
     if (query.isEmpty) {
       // 검색어가 비어있을 때 아무 동작도 하지 않습니다.
@@ -58,6 +89,46 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
     setState(() {
       _searchResults = results.take(4).toList();
     });
+  }
+
+  Future<void> _saveToSharedPreferences(Map<String, dynamic> data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const key = 'savedLocation';
+
+      // 기존에 저장된 데이터 가져오기
+      List<String> savedLocations = prefs.getStringList(key) ?? [];
+
+      // 현재 데이터를 String으로 변환하여 추가
+      savedLocations.add(jsonEncode(data));
+
+      // 변환한 데이터를 SharedPreferences에 저장
+      prefs.setStringList(key, savedLocations);
+    } catch (e) {
+      _logger.severe('SharedPreferences 저장 중 오류 발생: $e');
+    }
+  }
+
+  void _addToSharedPreferences(Map<String, dynamic> data) {
+    _loadFromSharedPreferences().then((savedLocations) {
+      if (savedLocations.length < 2) {
+        _saveToSharedPreferences(data);
+
+        // Navigator가 pop될 때 SearchLocationScreen과 함께 LocationDrawer도 pop
+        Navigator.pop(context, true); // true는 새로 고침이 필요하다는 플래그
+      } else {
+        // 최대 두 개까지만 저장 가능하므로 추가할 수 없음을 사용자에게 알림
+        _showSnackBar('최대 두 개의 위치만 저장할 수 있습니다.');
+      }
+    });
+  }
+
+  Future<void> clearSavedLocations() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'savedLocation';
+
+    // 해당 키에 저장된 데이터 모두 삭제
+    await prefs.remove(key);
   }
 
   @override
@@ -167,8 +238,13 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
               '${result['시도'] ?? ''} ${result['시군구'] ?? ''} ${result['읍면동/구'] ?? ''}',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            trailing:
-                const Icon(Icons.add_circle_outline, color: Color(0xff4C4838)),
+            trailing: IconButton(
+              icon: const Icon(Icons.add_circle_outline,
+                  color: Color(0xff4C4838)),
+              onPressed: () {
+                _addToSharedPreferences(result);
+              },
+            ),
           ),
         ),
       );
