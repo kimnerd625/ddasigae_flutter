@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../screens/search_location_screen.dart';
+
 class LocationDrawer extends StatefulWidget {
   final String appBarTitle;
   final String currentLocation;
@@ -51,15 +53,27 @@ class _LocationDrawerState extends State<LocationDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: GestureDetector(
-                  onTap: () {
-                    // Title을 눌렀을 때의 동작 추가
-                  },
-                  child: Text(
-                    widget.appBarTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.left,
-                  ),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Title을 눌렀을 때의 동작 추가
+                      },
+                      child: Text(
+                        widget.appBarTitle,
+                        style: Theme.of(context).textTheme.titleLarge,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    const SizedBox(width: 10.0),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Icon(
+                        Icons.keyboard_arrow_up,
+                        size: 30.0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // 현재 위치를 나타내는 부분
@@ -85,7 +99,7 @@ class _LocationDrawerState extends State<LocationDrawer> {
                 ),
               ),
               // 삭제 버튼이 있는 위치 목록
-              for (String location in ['서대문구 신촌동', '종로구 인사동', '강동구 상일동'])
+              for (String location in ['서대문구 신촌동', '강동구 상일동'])
                 Container(
                   margin: const EdgeInsets.only(left: 8.0, right: 8.0),
                   padding: EdgeInsets.zero,
@@ -131,6 +145,30 @@ class _LocationDrawerState extends State<LocationDrawer> {
                         color: const Color(0xff4C4838),
                         onPressed: () {
                           // 추가 주소 입력 동작 추가
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const SearchLocationScreen(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOutQuart;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
                         },
                       ),
                     ],
