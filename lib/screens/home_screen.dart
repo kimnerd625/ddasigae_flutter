@@ -62,13 +62,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xffFFF9E5),
         elevation: 0,
-        title: GestureDetector(
-          onTap: () {
-            _showLocationDrawer(context);
-          },
-          child: Text(
-            _appBarTitle,
-            style: const TextStyle(color: Colors.black),
+        title: Container(
+          margin: const EdgeInsets.only(top: 22.0, left: 4.0),
+          padding: const EdgeInsets.all(6.0),
+          child: GestureDetector(
+            onTap: () {
+              _showLocationDrawer(context);
+            },
+            child: Text(
+              _appBarTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
         ),
       ),

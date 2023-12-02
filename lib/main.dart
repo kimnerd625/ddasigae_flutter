@@ -28,6 +28,22 @@ class _MyAppState extends State<MyApp> {
       title: '따시개',
       theme: ThemeData(
         primarySwatch: Colors.yellow,
+        textTheme: const TextTheme(
+          // 여기서 fontFamily를 지정해줘야 합니다.
+          bodyLarge: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
+          bodyMedium: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
+          displayLarge: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
+          displayMedium: TextStyle(fontFamily: 'koPubWorldDotum'),
+          displaySmall: TextStyle(fontFamily: 'koPubWorldDotum'),
+          headlineMedium: TextStyle(fontFamily: 'koPubWorldDotum'),
+          headlineSmall: TextStyle(fontFamily: 'koPubWorldDotum'),
+          titleLarge: TextStyle(
+            color: Color(0xff4C4838),
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+            letterSpacing: -1.0,
+          ),
+        ),
       ),
       home: Scaffold(
         body: _pages[_currentIndex],

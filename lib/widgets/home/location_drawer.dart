@@ -69,7 +69,7 @@ class _LocationDrawerState extends State<LocationDrawer> {
                 ),
               ),
               // 삭제 버튼이 있는 리스트 아이템
-              for (String location in ['서울', '대전', '부산'])
+              for (String location in ['서대문구 신촌동', '종로구 인사동', '강동구 상일동'])
                 ListTile(
                   title: Text(
                     location,
