@@ -15,7 +15,7 @@ String findAdministrativeDistrict(
               latitude, longitude, districtLatitude, districtLongitude);
 
           // 일정 거리 이내에 위치하면 해당 행정구 반환
-          if (distance < 5.0) {
+          if (distance < 1.0) {
             String result = '';
             if (districtData['시군구'] != null) {
               result += districtData['시군구']!;

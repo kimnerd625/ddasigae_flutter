@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ddasigae_flutter/utils/district_utils.dart';
@@ -57,14 +58,71 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffFFF9E5),
       appBar: AppBar(
-        title: Text(_appBarTitle, style: const TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xffFFF9E5),
         elevation: 0,
+        title: GestureDetector(
+          onTap: () {
+            _showLocationDrawer(context);
+          },
+          child: Text(
+            _appBarTitle,
+            style: const TextStyle(color: Colors.black),
+          ),
+        ),
       ),
       body: Center(
         child: Text(_currentLocation),
       ),
     );
+  }
+
+  void _showLocationDrawer(BuildContext context) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    double appBarHeight = kToolbarHeight;
+    double fromTop =
+        renderBox.localToGlobal(const Offset(0, 0)).dy + appBarHeight + 15;
+
+    showLocationDialog(
+      context,
+      _appBarTitle,
+      _currentLocation,
+      _selectLocation,
+    );
+  }
+
+  Future<Object?> showLocationDialog(
+    BuildContext context,
+    String appBarTitle,
+    String currentLocation,
+    void Function(String location) selectLocation,
+  ) {
+    return showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (
+        BuildContext buildContext,
+        Animation<double> animation,
+        Animation<double> secondaryAnimation,
+      ) {
+        return LocationDrawer(
+          appBarTitle: appBarTitle,
+          currentLocation: currentLocation,
+          selectLocation: selectLocation,
+          selectedLocation: appBarTitle,
+        );
+      },
+    );
+  }
+
+  void _selectLocation(String location) {
+    setState(() {
+      _appBarTitle = location;
+      // 선택한 위치에 따라 필요한 업데이트 수행
+    });
   }
 }
