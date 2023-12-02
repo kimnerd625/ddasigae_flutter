@@ -3,6 +3,7 @@ import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ddasigae_flutter/utils/district_utils.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,6 +15,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _currentLocation = '현 위치를 찾는 중...';
   String _locationTitle = '서대문구 신촌동';
+  String _formatTodayDate() {
+    return DateFormat('MM월 dd일').format(DateTime.now());
+  }
 
   @override
   void initState() {
@@ -60,32 +64,51 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xffFFF9E5),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 40.0, left: 20.0),
-            padding: const EdgeInsets.all(6.0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _showLocationDrawer(context);
-                  },
-                  child: Text(
-                    _locationTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 40.0, left: 20.0),
+                    padding: const EdgeInsets.all(6.0),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showLocationDrawer(context);
+                          },
+                          child: Text(
+                            _locationTitle,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        const SizedBox(width: 10.0),
+                        GestureDetector(
+                          onTap: () {
+                            _showLocationDrawer(context);
+                          },
+                          child: const Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 30.0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10.0),
-                GestureDetector(
-                  onTap: () {
-                    _showLocationDrawer(context);
-                  },
-                  child: const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 30.0,
-                  ),
-                ),
-              ],
-            ),
+                  Container(
+                      padding: const EdgeInsets.only(
+                        left: 6.0,
+                        right: 6.0,
+                      ),
+                      margin: const EdgeInsets.only(left: 20.0),
+                      child: Text(
+                        _formatTodayDate(),
+                        style: Theme.of(context).textTheme.displaySmall,
+                      )),
+                ],
+              ),
+            ],
           ),
           // 추가적인 자식 위젯들을 여기에 추가할 수 있습니다.
         ],
