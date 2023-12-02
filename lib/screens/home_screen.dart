@@ -43,8 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           position.latitude, position.longitude, jsonData);
 
       setState(() {
-        _currentLocation =
-            '현재 위치: ${position.latitude}, ${position.longitude}\n행정구: $administrativeDistrict';
+        _currentLocation = administrativeDistrict;
         _appBarTitle = administrativeDistrict; // AppBar title 업데이트
       });
     } catch (e) {

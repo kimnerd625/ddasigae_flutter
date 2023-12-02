@@ -62,34 +62,81 @@ class _LocationDrawerState extends State<LocationDrawer> {
                   ),
                 ),
               ),
-              // 현재 위치를 나타내는 리스트 아이템
-              ListTile(
-                title: Text(
-                  widget.currentLocation,
+              // 현재 위치를 나타내는 부분
+              Container(
+                margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+                padding: EdgeInsets.zero,
+                decoration: BoxDecoration(
+                  color: widget.currentLocation == widget.selectedLocation
+                      ? const Color(0xffF7F0D7)
+                      : null,
+                  borderRadius: BorderRadius.circular(200),
                 ),
-              ),
-              // 삭제 버튼이 있는 리스트 아이템
-              for (String location in ['서대문구 신촌동', '종로구 인사동', '강동구 상일동'])
-                ListTile(
+                child: ListTile(
+                  dense: true,
                   title: Text(
-                    location,
-                    style: TextStyle(
-                      color: location == widget.selectedLocation
-                          ? Colors.blue
-                          : null,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      // 해당 위치 삭제 동작 추가
-                    },
+                    '현재 위치',
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
                   onTap: () {
-                    widget.selectLocation(location);
+                    widget.selectLocation(widget.currentLocation);
                     Navigator.pop(context);
                   },
                 ),
+              ),
+              // 삭제 버튼이 있는 위치 목록
+              for (String location in ['서대문구 신촌동', '종로구 인사동', '강동구 상일동'])
+                Container(
+                  margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  padding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    color: location == widget.selectedLocation
+                        ? const Color(0xffF7F0D7)
+                        : null,
+                    borderRadius: BorderRadius.circular(200),
+                  ),
+                  child: ListTile(
+                    dense: true,
+                    title: Text(
+                      location,
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.do_disturb_on_outlined),
+                      color: const Color(0xff4C4838),
+                      onPressed: () {
+                        // 해당 위치 삭제 동작 추가
+                      },
+                    ),
+                    onTap: () {
+                      widget.selectLocation(location);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              Container(
+                margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+                padding: EdgeInsets.zero,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(200),
+                ),
+                child: ListTile(
+                  dense: true,
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        color: const Color(0xff4C4838),
+                        onPressed: () {
+                          // 추가 주소 입력 동작 추가
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -33,14 +33,21 @@ class _MyAppState extends State<MyApp> {
           bodyLarge: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
           bodyMedium: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
           displayLarge: TextStyle(fontFamily: 'koPubWorldDotum'), // 추가
-          displayMedium: TextStyle(fontFamily: 'koPubWorldDotum'),
           displaySmall: TextStyle(fontFamily: 'koPubWorldDotum'),
           headlineMedium: TextStyle(fontFamily: 'koPubWorldDotum'),
           headlineSmall: TextStyle(fontFamily: 'koPubWorldDotum'),
           titleLarge: TextStyle(
+            fontFamily: 'koPubWorldDotum',
             color: Color(0xff4C4838),
             fontWeight: FontWeight.w700,
             fontSize: 24,
+            letterSpacing: -1.0,
+          ),
+          displayMedium: TextStyle(
+            fontFamily: 'koPubWorldDotum',
+            color: Color(0xff4C4838),
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
             letterSpacing: -1.0,
           ),
         ),
