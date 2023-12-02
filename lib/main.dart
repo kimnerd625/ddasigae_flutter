@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:ddasigae_flutter/screens/community_screen.dart';
 import 'package:ddasigae_flutter/screens/notification_screen.dart';
 import 'package:ddasigae_flutter/screens/profile_screen.dart';
 import 'package:ddasigae_flutter/screens/home_screen.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  await dotenv.load(); // 추가
+  runApp(const MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);

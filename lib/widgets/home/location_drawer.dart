@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../screens/search_location_screen.dart';
 
 class LocationDrawer extends StatefulWidget {
@@ -21,6 +22,108 @@ class LocationDrawer extends StatefulWidget {
 }
 
 class _LocationDrawerState extends State<LocationDrawer> {
+  List<Map<String, dynamic>> savedLocationsData = [];
+  double currentLocationLatitude = 0.0;
+  double currentLocationLongitude = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedLocations();
+    _loadCurrentLocation();
+  }
+
+  void _selectLocation(String location) async {
+    // Save the selected location in prefs
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('selectedLocation', location);
+  }
+
+  Future<void> _loadCurrentLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double currentLatitude = prefs.getDouble('currentLatitude') ?? 0.0;
+    double currentLongitude = prefs.getDouble('currentLongitude') ?? 0.0;
+
+    setState(() {
+      currentLocationLatitude = currentLatitude;
+      currentLocationLongitude = currentLongitude;
+    });
+  }
+
+  Future<void> _loadSavedLocations() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'savedLocation';
+
+    // 저장된 데이터 가져오기
+    List<String> savedLocations = prefs.getStringList(key) ?? [];
+
+    // 가져온 데이터를 Map<String, dynamic>으로 디코딩하여 저장
+    setState(() {
+      savedLocationsData = savedLocations
+          .map<Map<String, dynamic>>((location) => jsonDecode(location))
+          .toList();
+    });
+  }
+
+  Future<void> _openSearchLocationScreen() async {
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const SearchLocationScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOutQuart;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+      ),
+    ).then((result) {
+      if (result != null && result as bool) {
+        // result가 true인 경우, SearchLocationScreen에서 새로 고침이 필요함
+        _loadSavedLocations();
+      }
+    });
+  }
+
+  Future<void> _removeLocation(Map<String, dynamic> locationData) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'savedLocation';
+
+    // 저장된 데이터 가져오기
+    List<String> savedLocations = prefs.getStringList(key) ?? [];
+
+    // 해당 위치 정보 제거
+    savedLocations.remove(jsonEncode(locationData));
+
+    // 업데이트된 데이터를 SharedPreferences에 저장
+    prefs.setStringList(key, savedLocations);
+
+    // UI 업데이트
+    _loadSavedLocations();
+
+    // If the selected location is removed, update _locationTitle
+    String selectedLocation = '${locationData['시군구']} ${locationData['읍면동/구']}';
+    if (widget.appBarTitle == selectedLocation) {
+      _selectLocation(''); // Set to an empty string or any default value
+    }
+  }
+
+  Future<void> _saveLatitudeLongitude(double latitude, double longitude) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('latitude', latitude);
+    prefs.setDouble('longitude', longitude);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +132,9 @@ class _LocationDrawerState extends State<LocationDrawer> {
         alignment: Alignment.topLeft,
         child: Container(
           margin: const EdgeInsets.only(top: 30, left: 10),
+          padding: const EdgeInsets.only(
+            bottom: 20,
+          ),
           width: MediaQuery.of(context).size.width * 0.8,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -94,17 +200,23 @@ class _LocationDrawerState extends State<LocationDrawer> {
                   ),
                   onTap: () {
                     widget.selectLocation(widget.currentLocation);
+
+                    // 추가된 코드: 현재 위치를 눌렀을 때의 동작
+                    _saveLatitudeLongitude(
+                        currentLocationLatitude, currentLocationLongitude);
+
                     Navigator.pop(context);
                   },
                 ),
               ),
               // 삭제 버튼이 있는 위치 목록
-              for (String location in ['서대문구 신촌동', '강동구 상일동'])
+              for (Map<String, dynamic> locationData in savedLocationsData)
                 Container(
                   margin: const EdgeInsets.only(left: 8.0, right: 8.0),
                   padding: EdgeInsets.zero,
                   decoration: BoxDecoration(
-                    color: location == widget.selectedLocation
+                    color: '${locationData['시군구']} ${locationData['읍면동/구']}' ==
+                            widget.selectedLocation
                         ? const Color(0xffF7F0D7)
                         : null,
                     borderRadius: BorderRadius.circular(200),
@@ -112,7 +224,7 @@ class _LocationDrawerState extends State<LocationDrawer> {
                   child: ListTile(
                     dense: true,
                     title: Text(
-                      location,
+                      '${locationData['시군구']} ${locationData['읍면동/구']}',
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
                     trailing: IconButton(
@@ -120,61 +232,45 @@ class _LocationDrawerState extends State<LocationDrawer> {
                       color: const Color(0xff4C4838),
                       onPressed: () {
                         // 해당 위치 삭제 동작 추가
+                        _removeLocation(locationData);
                       },
                     ),
                     onTap: () {
-                      widget.selectLocation(location);
+                      widget.selectLocation(
+                          '${locationData['시군구']} ${locationData['읍면동/구']}');
+                      _saveLatitudeLongitude(
+                          locationData['위도'], locationData['경도']);
                       Navigator.pop(context);
                     },
                   ),
                 ),
-              Container(
-                margin: const EdgeInsets.only(left: 8.0, right: 8.0),
-                padding: EdgeInsets.zero,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(200),
-                ),
-                child: ListTile(
-                  dense: true,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        color: const Color(0xff4C4838),
-                        onPressed: () {
-                          // 추가 주소 입력 동작 추가
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const SearchLocationScreen(),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                const begin = Offset(1.0, 0.0);
-                                const end = Offset.zero;
-                                const curve = Curves.easeInOutQuart;
-
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-
-                                var offsetAnimation = animation.drive(tween);
-
-                                return SlideTransition(
-                                  position: offsetAnimation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+              if (savedLocationsData.length < 2)
+                Container(
+                  margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  padding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(200),
+                  ),
+                  child: ListTile(
+                    dense: true,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero, // 여백 제거
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.add),
+                          color: const Color(0xff4C4838),
+                          onPressed: () {
+                            // 추가 주소 입력 동작 추가
+                            _openSearchLocationScreen();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
