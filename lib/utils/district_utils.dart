@@ -1,7 +1,7 @@
 import 'package:ddasigae_flutter/utils/distance_utils.dart';
 
-String findAdministrativeDistrict(
-    double latitude, double longitude, Map<String, dynamic> jsonData) {
+String findAdministrativeDistrict(double latitude, double longitude,
+    Map<String, dynamic> jsonData, int attempt) {
   for (var province in jsonData.keys) {
     if (province == '서울특별시') {
       for (var districtData in jsonData[province]) {
@@ -15,7 +15,7 @@ String findAdministrativeDistrict(
               latitude, longitude, districtLatitude, districtLongitude);
 
           // 일정 거리 이내에 위치하면 해당 행정구 반환
-          if (distance < 1.0) {
+          if (distance < 1.0 * attempt) {
             String result = '';
             if (districtData['시군구'] != null) {
               result += districtData['시군구']!;
@@ -32,6 +32,5 @@ String findAdministrativeDistrict(
       }
     }
   }
-  print("왜 안 돼");
   return '행정구를 찾을 수 없습니다.';
 }

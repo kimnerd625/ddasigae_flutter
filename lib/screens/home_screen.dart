@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _currentLocation = '현 위치를 찾는 중...';
-  String _appBarTitle = '서대문구 신촌동';
+  String _locationTitle = '서대문구 신촌동';
 
   @override
   void initState() {
@@ -40,11 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
           .loadString('assets/json/address.json');
       Map<String, dynamic> jsonData = json.decode(jsonString);
       String administrativeDistrict = findAdministrativeDistrict(
-          position.latitude, position.longitude, jsonData);
+          position.latitude, position.longitude, jsonData, 4);
 
       setState(() {
         _currentLocation = administrativeDistrict;
-        _appBarTitle = administrativeDistrict; // AppBar title 업데이트
+        _locationTitle = administrativeDistrict; // AppBar title 업데이트
       });
     } catch (e) {
       print('위치를 가져오는 데 문제가 발생했습니다: $e');
@@ -58,25 +58,37 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffFFF9E5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xffFFF9E5),
-        elevation: 0,
-        title: Container(
-          margin: const EdgeInsets.only(top: 22.0, left: 4.0),
-          padding: const EdgeInsets.all(6.0),
-          child: GestureDetector(
-            onTap: () {
-              _showLocationDrawer(context);
-            },
-            child: Text(
-              _appBarTitle,
-              style: Theme.of(context).textTheme.titleLarge,
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 40.0, left: 20.0),
+            padding: const EdgeInsets.all(6.0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _showLocationDrawer(context);
+                  },
+                  child: Text(
+                    _locationTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                const SizedBox(width: 10.0),
+                GestureDetector(
+                  onTap: () {
+                    _showLocationDrawer(context);
+                  },
+                  child: const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 30.0,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ),
-      body: Center(
-        child: Text(_currentLocation),
+          // 추가적인 자식 위젯들을 여기에 추가할 수 있습니다.
+        ],
       ),
     );
   }
@@ -89,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     showLocationDialog(
       context,
-      _appBarTitle,
+      _locationTitle,
       _currentLocation,
       _selectLocation,
     );
@@ -124,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _selectLocation(String location) {
     setState(() {
-      _appBarTitle = location;
+      _locationTitle = location;
       // 선택한 위치에 따라 필요한 업데이트 수행
     });
   }
