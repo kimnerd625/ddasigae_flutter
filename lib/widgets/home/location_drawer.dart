@@ -23,11 +23,31 @@ class LocationDrawer extends StatefulWidget {
 
 class _LocationDrawerState extends State<LocationDrawer> {
   List<Map<String, dynamic>> savedLocationsData = [];
+  double currentLocationLatitude = 0.0;
+  double currentLocationLongitude = 0.0;
 
   @override
   void initState() {
     super.initState();
     _loadSavedLocations();
+    _loadCurrentLocation();
+  }
+
+  void _selectLocation(String location) async {
+    // Save the selected location in prefs
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('selectedLocation', location);
+  }
+
+  Future<void> _loadCurrentLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double currentLatitude = prefs.getDouble('currentLatitude') ?? 0.0;
+    double currentLongitude = prefs.getDouble('currentLongitude') ?? 0.0;
+
+    setState(() {
+      currentLocationLatitude = currentLatitude;
+      currentLocationLongitude = currentLongitude;
+    });
   }
 
   Future<void> _loadSavedLocations() async {
@@ -90,6 +110,18 @@ class _LocationDrawerState extends State<LocationDrawer> {
 
     // UI 업데이트
     _loadSavedLocations();
+
+    // If the selected location is removed, update _locationTitle
+    String selectedLocation = '${locationData['시군구']} ${locationData['읍면동/구']}';
+    if (widget.appBarTitle == selectedLocation) {
+      _selectLocation(''); // Set to an empty string or any default value
+    }
+  }
+
+  Future<void> _saveLatitudeLongitude(double latitude, double longitude) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('latitude', latitude);
+    prefs.setDouble('longitude', longitude);
   }
 
   @override
@@ -168,6 +200,11 @@ class _LocationDrawerState extends State<LocationDrawer> {
                   ),
                   onTap: () {
                     widget.selectLocation(widget.currentLocation);
+
+                    // 추가된 코드: 현재 위치를 눌렀을 때의 동작
+                    _saveLatitudeLongitude(
+                        currentLocationLatitude, currentLocationLongitude);
+
                     Navigator.pop(context);
                   },
                 ),
@@ -201,6 +238,8 @@ class _LocationDrawerState extends State<LocationDrawer> {
                     onTap: () {
                       widget.selectLocation(
                           '${locationData['시군구']} ${locationData['읍면동/구']}');
+                      _saveLatitudeLongitude(
+                          locationData['위도'], locationData['경도']);
                       Navigator.pop(context);
                     },
                   ),

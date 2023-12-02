@@ -1,9 +1,10 @@
-import 'dart:convert';
-import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:ddasigae_flutter/utils/district_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+
+import 'package:ddasigae_flutter/utils/current_location_utils.dart';
+import 'package:ddasigae_flutter/services/weather.dart';
+import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -23,38 +24,64 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
+    _loadWeather();
+    _loadInitialLocationTitle();
+  }
+
+  @override
+  void dispose() {
+    // 필요에 따라 위치 갱신 등의 정리 작업을 수행할 수 있음
+    super.dispose();
+  }
+
+  Future<void> _loadInitialLocationTitle() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String initialLocationTitle =
+        prefs.getString('selectedLocation') ?? '서대문구 신촌동';
+    setState(() {
+      _locationTitle = initialLocationTitle;
+    });
   }
 
   Future<void> _getCurrentLocation() async {
+    await CurrentLocationUtils.getCurrentLocation(context, (String location) {
+      setState(() {
+        _currentLocation = location;
+      });
+    });
+  }
+
+  Future<void> _loadWeather() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double latitude = prefs.getDouble('latitude') ?? 0.0;
+    double longitude = prefs.getDouble('longitude') ?? 0.0;
+
+    // 이전 위치 정보를 가져옵니다.
+    double previousLatitude = prefs.getDouble('currentLatitude') ?? 0.0;
+    double previousLongitude = prefs.getDouble('currentLongitude') ?? 0.0;
+
+    // 이전 위치와 현재 위치를 비교하여 변경되었는지 확인합니다.
+    if (latitude != 0.0 &&
+        longitude != 0.0 &&
+        (latitude != previousLatitude || longitude != previousLongitude)) {
+      // 위도와 경도가 유효하고 이전 위치와 다를 경우에만 날씨 정보 로드
+      await _getWeather(latitude, longitude);
+
+      // 위치 정보를 preference에 저장 (현재 위치가 이전 위치로 업데이트됨)
+      prefs.setDouble('currentLatitude', latitude);
+      prefs.setDouble('currentLongitude', longitude);
+    }
+  }
+
+  // 추가된 메서드: 현재 위치에 대한 날씨 정보 가져오기
+  Future<dynamic> _getWeather(double latitude, double longitude) async {
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          print('위치 권한이 거부되었습니다.');
-          return;
-        }
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      // JSON 파일 로드 및 행정구 추출
-      String jsonString = await DefaultAssetBundle.of(context)
-          .loadString('assets/json/address.json');
-      Map<String, dynamic> jsonData = json.decode(jsonString);
-      String administrativeDistrict = findAdministrativeDistrict(
-          position.latitude, position.longitude, jsonData, 4);
-
-      setState(() {
-        _currentLocation = administrativeDistrict;
-        _locationTitle = administrativeDistrict; // AppBar title 업데이트
-      });
+      var weatherData =
+          await OpenWeatherService().getWeather(latitude, longitude);
+      print(weatherData);
     } catch (e) {
-      print('위치를 가져오는 데 문제가 발생했습니다: $e');
-      setState(() {
-        _currentLocation = '현 위치를 찾을 수 없습니다.';
-      });
+      print('날씨 정보를 가져오는 데 문제가 발생했습니다: $e');
+      // 날씨 정보를 가져오는 동안 에러가 발생한 경우 처리할 코드
     }
   }
 
@@ -157,10 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _selectLocation(String location) {
+  void _selectLocation(String location) async {
     setState(() {
       _locationTitle = location;
-      // 선택한 위치에 따라 필요한 업데이트 수행
+      // 필요한 경우 추가 업데이트 수행
     });
+
+    // Save the selected location in prefs
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('selectedLocation', location);
   }
 }
