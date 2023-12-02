@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+
+final Logger _logger = Logger('_SearchLocationScreenState');
 
 class SearchLocationScreen extends StatefulWidget {
   const SearchLocationScreen({Key? key}) : super(key: key);
@@ -35,8 +38,8 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
         _jsonData = seoulData;
         _searchResults = []; // 초기에는 전체 데이터를 보여줍니다.
       });
-    } catch (e) {
-      print('파일 로딩 중 오류 발생: $e');
+    } catch (e, stacktrace) {
+      _logger.severe('파일 로딩 중 오류 발생: $e', e, stacktrace);
     }
   }
 
