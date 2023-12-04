@@ -24,8 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _loadWeather();
     _loadInitialLocationTitle();
+    _loadWeather();
   }
 
   @override
@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-//
   Future<void> _loadInitialLocationTitle() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String initialLocationTitle = prefs.getString('selectedLocation') ??
@@ -58,32 +57,14 @@ class _HomeScreenState extends State<HomeScreen> {
     double latitude = prefs.getDouble('latitude') ?? 0.0;
     double longitude = prefs.getDouble('longitude') ?? 0.0;
 
-    // 이전 위치 정보를 가져옵니다.
-    double previousLatitude = prefs.getDouble('currentLatitude') ?? 0.0;
-    double previousLongitude = prefs.getDouble('currentLongitude') ?? 0.0;
-
-    // 이전 위치와 현재 위치를 비교하여 변경되었는지 확인합니다.
-    if (latitude != 0.0 &&
-        longitude != 0.0 &&
-        (latitude != previousLatitude || longitude != previousLongitude)) {
-      // 위도와 경도가 유효하고 이전 위치와 다를 경우에만 날씨 정보 로드
-      await _getWeather(latitude, longitude);
-
-      // 위치 정보를 preference에 저장 (현재 위치가 이전 위치로 업데이트됨)
-      prefs.setDouble('currentLatitude', latitude);
-      prefs.setDouble('currentLongitude', longitude);
-    }
-  }
-
-  // 추가된 메서드: 현재 위치에 대한 날씨 정보 가져오기
-  Future<dynamic> _getWeather(double latitude, double longitude) async {
-    try {
-      var weatherData =
-          await OpenWeatherService().getWeather(latitude, longitude);
-      print(weatherData);
-    } catch (e) {
-      print('날씨 정보를 가져오는 데 문제가 발생했습니다: $e');
-      // 날씨 정보를 가져오는 동안 에러가 발생한 경우 처리할 코드
+    if (latitude != 0.0 && longitude != 0.0) {
+      try {
+        var weatherData =
+            await OpenWeatherService().getWeather(latitude, longitude);
+        print(weatherData);
+      } catch (e) {
+        print('날씨 정보를 가져오는 데 문제가 발생했습니다: $e');
+      }
     }
   }
 
@@ -146,26 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showLocationDrawer(BuildContext context) {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    double appBarHeight = kToolbarHeight;
-    double fromTop =
-        renderBox.localToGlobal(const Offset(0, 0)).dy + appBarHeight + 15;
-
-    showLocationDialog(
-      context,
-      _locationTitle,
-      _currentLocation,
-      _selectLocation,
-    );
-  }
-
-  Future<Object?> showLocationDialog(
-    BuildContext context,
-    String appBarTitle,
-    String currentLocation,
-    void Function(String location) selectLocation,
-  ) {
-    return showGeneralDialog(
+    showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
@@ -177,10 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
         Animation<double> secondaryAnimation,
       ) {
         return LocationDrawer(
-          appBarTitle: appBarTitle,
-          currentLocation: currentLocation,
-          selectLocation: selectLocation,
-          selectedLocation: appBarTitle,
+          appBarTitle: _locationTitle,
+          currentLocation: _currentLocation,
+          selectLocation: _selectLocation,
+          selectedLocation: _locationTitle,
+          loadWeather: _loadWeather,
         );
       },
     );
@@ -189,10 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _selectLocation(String location) async {
     setState(() {
       _locationTitle = location;
-      // 필요한 경우 추가 업데이트 수행
     });
 
-    // Save the selected location in prefs
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('selectedLocation', location);
   }

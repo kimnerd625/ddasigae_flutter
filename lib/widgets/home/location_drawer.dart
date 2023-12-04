@@ -8,6 +8,7 @@ class LocationDrawer extends StatefulWidget {
   final String currentLocation;
   final Function(String) selectLocation;
   final String selectedLocation;
+  final Future<void> Function() loadWeather;
 
   const LocationDrawer({
     Key? key,
@@ -15,6 +16,7 @@ class LocationDrawer extends StatefulWidget {
     required this.currentLocation,
     required this.selectLocation,
     required this.selectedLocation,
+    required this.loadWeather,
   }) : super(key: key);
 
   @override
@@ -200,11 +202,9 @@ class _LocationDrawerState extends State<LocationDrawer> {
                   ),
                   onTap: () {
                     widget.selectLocation(widget.currentLocation);
-
-                    // 추가된 코드: 현재 위치를 눌렀을 때의 동작
                     _saveLatitudeLongitude(
                         currentLocationLatitude, currentLocationLongitude);
-
+                    widget.loadWeather();
                     Navigator.pop(context);
                   },
                 ),
@@ -240,6 +240,7 @@ class _LocationDrawerState extends State<LocationDrawer> {
                           '${locationData['시군구']} ${locationData['읍면동/구']}');
                       _saveLatitudeLongitude(
                           locationData['위도'], locationData['경도']);
+                      widget.loadWeather();
                       Navigator.pop(context);
                     },
                   ),
