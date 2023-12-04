@@ -34,10 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+//
   Future<void> _loadInitialLocationTitle() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String initialLocationTitle =
-        prefs.getString('selectedLocation') ?? '서대문구 신촌동';
+    String initialLocationTitle = prefs.getString('selectedLocation') ??
+        prefs.getString('currentLocation') ??
+        '서대문구 신촌동';
     setState(() {
       _locationTitle = initialLocationTitle;
     });
