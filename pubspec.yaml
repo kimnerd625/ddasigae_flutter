@@ -82,3 +82,7 @@ flutter:
           weight: 500
         - asset: assets/fonts/KoPubWorld Dotum Bold.ttf
           weight: 700
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Regular.ttf
+          weight: 300

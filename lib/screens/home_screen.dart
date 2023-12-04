@@ -1,10 +1,9 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-
-import 'package:ddasigae_flutter/utils/current_location_utils.dart';
-import 'package:ddasigae_flutter/services/weather.dart';
-import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ddasigae_flutter/services/weather.dart';
+import 'package:ddasigae_flutter/utils/current_location_utils.dart';
+import 'package:ddasigae_flutter/widgets/home/location_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,6 +15,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _currentLocation = '현 위치를 찾는 중...';
   String _locationTitle = '서대문구 신촌동';
+  int _temperatureValue = 0;
+  int _maxTemperatureValue = 0;
+  int _minTemperatureValue = 0;
+  String _temperature = '10°';
+
   String _formatTodayDate() {
     return DateFormat('MM월 dd일').format(DateTime.now());
   }
@@ -62,6 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
         var weatherData =
             await OpenWeatherService().getWeather(latitude, longitude);
         print(weatherData);
+        _temperatureValue = weatherData['main']['temp'].toInt();
+        _maxTemperatureValue = weatherData['main']['temp_max'].toInt();
+        _minTemperatureValue = weatherData['main']['temp_min'].toInt();
+        _temperature = '$_temperatureValue°';
       } catch (e) {
         print('날씨 정보를 가져오는 데 문제가 발생했습니다: $e');
       }
@@ -81,7 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 40.0, left: 20.0),
-                    padding: const EdgeInsets.all(6.0),
+                    padding: const EdgeInsets.only(
+                      left: 6.0,
+                    ),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -107,17 +117,55 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Container(
-                      padding: const EdgeInsets.only(
-                        left: 6.0,
-                        right: 6.0,
-                      ),
-                      margin: const EdgeInsets.only(left: 20.0),
-                      child: Text(
-                        _formatTodayDate(),
-                        style: Theme.of(context).textTheme.displaySmall,
-                      )),
+                    padding: const EdgeInsets.only(
+                      left: 6.0,
+                      right: 6.0,
+                    ),
+                    margin: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      _formatTodayDate(),
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                  ),
                 ],
               ),
+              const Spacer(),
+              Container(
+                margin: const EdgeInsets.only(top: 40.0, right: 26.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _temperature,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 5.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(_maxTemperatureValue.toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: const Color(0xffF16565),
+                                  ),
+                              textAlign: TextAlign.right),
+                          Text(_minTemperatureValue.toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: const Color(0xff6FA2D1),
+                                  ),
+                              textAlign: TextAlign.right),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
           // 추가적인 자식 위젯들을 여기에 추가할 수 있습니다.

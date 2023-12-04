@@ -133,7 +133,7 @@ class _LocationDrawerState extends State<LocationDrawer> {
       body: Align(
         alignment: Alignment.topLeft,
         child: Container(
-          margin: const EdgeInsets.only(top: 30, left: 10),
+          margin: const EdgeInsets.only(top: 40, left: 10),
           padding: const EdgeInsets.only(
             bottom: 20,
           ),
@@ -160,7 +160,8 @@ class _LocationDrawerState extends State<LocationDrawer> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding:
+                    const EdgeInsets.only(top: 13.0, left: 16.0, bottom: 10.0),
                 child: Row(
                   children: [
                     GestureDetector(
