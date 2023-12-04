@@ -71,6 +71,13 @@ class _MyAppState extends State<MyApp> {
             fontSize: 15,
             letterSpacing: -0.15,
           ),
+          labelLarge: TextStyle(
+            fontFamily: 'koPubWorldDotum',
+            color: Color(0xff656253),
+            fontWeight: FontWeight.w700,
+            fontSize: 13.23,
+            letterSpacing: -0.132,
+          ),
         ),
       ),
       home: Scaffold(
