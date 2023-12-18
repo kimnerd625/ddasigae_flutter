@@ -31,7 +31,7 @@ String findAdministrativeDistrict(double latitude, double longitude,
                 }
                 result += districtData['읍면동/구']!;
               }
-              return result.isNotEmpty ? result : '행정구를 찾을 수 없습니다.';
+              return result.isNotEmpty ? result : '위치 찾기 오류';
             }
           }
         }
@@ -44,5 +44,5 @@ String findAdministrativeDistrict(double latitude, double longitude,
     return '더 이상 값이 안 올라가게 할 수 있습니다.';
   }
 
-  return '행정구를 찾을 수 없습니다.';
+  return '위치 찾기 오류';
 }

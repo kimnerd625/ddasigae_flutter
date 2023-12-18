@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>616572887836-8j912ve98ub749eb63j8icft9vp4oqvq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.616572887836-8j912ve98ub749eb63j8icft9vp4oqvq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBcHktL2dROJJZQV41ywdDlv-7YDsvjOZs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>616572887836</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.ddasigaeFlutter</string>
+	<key>PROJECT_ID</key>
+	<string>ddasigae-d5462</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ddasigae-d5462.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:616572887836:ios:ffe12eca2cdc34d704d0d9</string>
+	<key>DATABASE_URL</key>
+	<string>https://ddasigae-d5462-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
